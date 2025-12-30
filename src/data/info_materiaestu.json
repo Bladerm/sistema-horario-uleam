@@ -1,0 +1,89 @@
+{
+  "materias": {
+    "Gestion de proyecto": {
+      "nombre": "Gestion de proyecto de la tecnologia de la informacion",
+      "aulas": "INF-A-Aula 308 - INF-B-Aula de Prácticas 204",
+      "horario": "LUN07:00-08:00LUN08:00-09:00MAR11:00-12:00MAR12:00-13:00",
+      "alumnos": "40 estudiantes",
+      "semestre": "Quinto semestre",
+      "paralelo": "A",
+      "profesores": [
+        {
+          "nombre": "SANDRA JACKELINE SOLEDISPA PEREIRA",
+          "emails": [
+            "sandra.soledispa@uleam.edu.ec",
+            "soledispasandra@gmail.com"
+          ]
+        }
+      ]
+    },
+    "Redes de computadora": {
+      "nombre": "Redes de computadora",
+      "aulas": "INF-A-Aula 305 - INF-B-Lab de Redes 201",
+      "horario": "MAR08:00-09:00MAR09:00-10:00MAR10:00-11:00MIE10:00-11:00MIE11:00-12:00",
+      "alumnos": "38 estudiantes",
+      "semestre": "Quinto semestre",
+      "paralelo": "A",
+      "profesores": [
+        {
+          "nombre": "CARLOS ALBERTO MENDOZA VERA",
+          "emails": [
+            "carlos.mendoza@uleam.edu.ec",
+            "cmendoza@gmail.com"
+          ]
+        }
+      ]
+    },
+    "Mineria de dato": {
+      "nombre": "Mineria de dato",
+      "aulas": "INF-A-Aula 310 - INF-B-Lab de Datos 301",
+      "horario": "MIE08:00-09:00MIE09:00-10:00VIE08:00-09:00VIE09:00-10:00VIE10:00-11:00",
+      "alumnos": "42 estudiantes",
+      "semestre": "Quinto semestre",
+      "paralelo": "A",
+      "profesores": [
+        {
+          "nombre": "MARÍA FERNANDA LOOR CASTRO",
+          "emails": [
+            "maria.loor@uleam.edu.ec",
+            "mfloor@gmail.com"
+          ]
+        }
+      ]
+    },
+    "Ingenieria de software": {
+      "nombre": "Ingenieria de software",
+      "aulas": "INF-A-Aula 307 - INF-B-Aula 205",
+      "horario": "LUN14:00-15:00LUN15:00-16:00JUE09:00-10:00JUE10:00-11:00",
+      "alumnos": "35 estudiantes",
+      "semestre": "Quinto semestre",
+      "paralelo": "A",
+      "profesores": [
+        {
+          "nombre": "ROBERTO JAVIER PINARGOTE MOREIRA",
+          "emails": [
+            "roberto.pinargote@uleam.edu.ec",
+            "rpinargote@gmail.com"
+          ]
+        }
+      ]
+    },
+    "Aplicacion web 1": {
+      "nombre": "Aplicacion web 1",
+      "aulas": "INF-A-Lab 401 - INF-B-Lab 402",
+      "horario": "LUN10:00-11:00LUN11:00-12:00JUE11:00-12:00JUE12:00-13:00VIE11:00-12:00VIE12:00-13:00",
+      "alumnos": "40 estudiantes",
+      "semestre": "Quinto semestre",
+      "paralelo": "A",
+      "profesores": [
+        {
+          "nombre": "ANA LUCÍA ZAMBRANO INTRIAGO",
+          "emails": [
+            "ana.zambrano@uleam.edu.ec",
+            "azambrano@gmail.com"
+          ]
+        }
+      ]
+    }
+  }
+}

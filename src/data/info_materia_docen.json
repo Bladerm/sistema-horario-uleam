@@ -1,0 +1,171 @@
+{
+  "materias": {
+    "Gestion de proyecto": {
+      "nombre": "Gestion de proyecto de la tecnologia de la informacion",
+      "aulas": "INF-A-Aula 308 - INF-B-Aula de Prácticas 204",
+      "alumnos": "40 estudiantes",
+      "semestre": "Quinto semestre",
+      "curso": "TI Quinto Semestre \"A\"",
+      "estudiantes": [
+        {
+          "nombre": "JOSE MANUEL CASTILLO LOOR",
+          "email": "jose.castillo@uleam.edu.ec"
+        },
+        {
+          "nombre": "MARÍA FERNANDA LÓPEZ GARCÍA",
+          "email": "maria.lopez@uleam.edu.ec"
+        },
+        {
+          "nombre": "CARLOS ANDRÉS MENDOZA VERA",
+          "email": "carlos.mendoza@uleam.edu.ec"
+        },
+        {
+          "nombre": "ANA LUCÍA ZAMBRANO INTRIAGO",
+          "email": "ana.zambrano@uleam.edu.ec"
+        },
+        {
+          "nombre": "PEDRO ALBERTO SOLEDISPA CASTRO",
+          "email": "pedro.soledispa@uleam.edu.ec"
+        }
+      ]
+    },
+    "REDES DE COMPUTADORA": {
+      "nombre": "Redes de computadora",
+      "aulas": "INF-A-Aula 305 - INF-B-Lab de Redes 201",
+      "alumnos": "38 estudiantes",
+      "semestre": "Quinto semestre",
+      "curso": "TI Quinto Semestre \"A\"",
+      "estudiantes": [
+        {
+          "nombre": "ROBERTO JAVIER PINARGOTE MOREIRA",
+          "email": "roberto.pinargote@uleam.edu.ec"
+        },
+        {
+          "nombre": "SANDRA JACKELINE SOLEDISPA PEREIRA",
+          "email": "sandra.soledispa@uleam.edu.ec"
+        },
+        {
+          "nombre": "LUIS EDUARDO CEDEÑO LOOR",
+          "email": "luis.cedeno@uleam.edu.ec"
+        },
+        {
+          "nombre": "DIANA CAROLINA VERA MEZA",
+          "email": "diana.vera@uleam.edu.ec"
+        }
+      ]
+    },
+    "MINERIA DE DATO": {
+      "nombre": "Mineria de dato",
+      "aulas": "INF-A-Aula 310 - INF-B-Lab de Datos 301",
+      "alumnos": "42 estudiantes",
+      "semestre": "Quinto semestre",
+      "curso": "TI Quinto Semestre \"A\"",
+      "estudiantes": [
+        {
+          "nombre": "FRANCISCO JAVIER MUÑOZ TORRES",
+          "email": "francisco.munoz@uleam.edu.ec"
+        },
+        {
+          "nombre": "GABRIELA NICOLE BRAVO SANTOS",
+          "email": "gabriela.bravo@uleam.edu.ec"
+        },
+        {
+          "nombre": "ANDRÉS FELIPE PONCE GARCÍA",
+          "email": "andres.ponce@uleam.edu.ec"
+        },
+        {
+          "nombre": "VALERIA ALEJANDRA MOREIRA LOOR",
+          "email": "valeria.moreira@uleam.edu.ec"
+        },
+        {
+          "nombre": "DIEGO ARMANDO CASTRO MENDOZA",
+          "email": "diego.castro@uleam.edu.ec"
+        }
+      ]
+    },
+    "Algebra": {
+      "nombre": "Algebra",
+      "aulas": "INF-A-Aula 103",
+      "alumnos": "35 estudiantes",
+      "semestre": "Primer semestre",
+      "curso": "TI Primer Semestre \"A\"",
+      "estudiantes": [
+        {
+          "nombre": "JUAN CARLOS VERA MOREIRA",
+          "email": "juan.vera@uleam.edu.ec"
+        },
+        {
+          "nombre": "SOFÍA ELIZABETH TORRES PÁEZ",
+          "email": "sofia.torres@uleam.edu.ec"
+        },
+        {
+          "nombre": "CRISTIAN DAVID LOOR CASTRO",
+          "email": "cristian.loor@uleam.edu.ec"
+        }
+      ]
+    },
+    "Fisica": {
+      "nombre": "Fisica",
+      "aulas": "INF-A-Aula 208",
+      "alumnos": "33 estudiantes",
+      "semestre": "Primer semestre",
+      "curso": "TI Primer Semestre \"A\"",
+      "estudiantes": [
+        {
+          "nombre": "MICHELLE ADRIANA CEDEÑO VERA",
+          "email": "michelle.cedeno@uleam.edu.ec"
+        },
+        {
+          "nombre": "KEVIN ANDRÉS ZAMBRANO LOOR",
+          "email": "kevin.zambrano@uleam.edu.ec"
+        },
+        {
+          "nombre": "JOSELYN MARÍA INTRIAGO MEZA",
+          "email": "joselyn.intriago@uleam.edu.ec"
+        }
+      ]
+    },
+    "POO": {
+      "nombre": "Programacion Orientada a Objetos",
+      "aulas": "INF-A-Aula 103",
+      "alumnos": "30 estudiantes",
+      "semestre": "Tercer semestre",
+      "curso": "TI Tercer Semestre \"B\"",
+      "estudiantes": [
+        {
+          "nombre": "BRYAN ALEXANDER MOREIRA SANTOS",
+          "email": "bryan.moreira@uleam.edu.ec"
+        },
+        {
+          "nombre": "ESTEFANÍA NICOLE PONCE VERA",
+          "email": "estefania.ponce@uleam.edu.ec"
+        },
+        {
+          "nombre": "DANIEL EDUARDO CASTRO LOOR",
+          "email": "daniel.castro@uleam.edu.ec"
+        }
+      ]
+    },
+    "Base de dato": {
+      "nombre": "Base de dato",
+      "aulas": "INF-A-Aula 203",
+      "alumnos": "28 estudiantes",
+      "semestre": "Cuarto semestre",
+      "curso": "TI Cuarto Semestre \"B\"",
+      "estudiantes": [
+        {
+          "nombre": "CAROLINA FERNANDA MENDOZA GARCÍA",
+          "email": "carolina.mendoza@uleam.edu.ec"
+        },
+        {
+          "nombre": "ALEX JAVIER SOLEDISPA TORRES",
+          "email": "alex.soledispa@uleam.edu.ec"
+        },
+        {
+          "nombre": "PAOLA ANDREA VERA CASTRO",
+          "email": "paola.vera@uleam.edu.ec"
+        }
+      ]
+    }
+  }
+}
