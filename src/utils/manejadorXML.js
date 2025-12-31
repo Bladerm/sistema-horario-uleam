@@ -1,17 +1,19 @@
 class XMLHorarioManager {
     constructor() {
-        this.horarios = [];
+        this.grupos = [];
         this.docentes = [];
         this.materias = [];
-        this.storageKey = 'horariosULEAM';
+        this.storageKey = 'gruposHorariosULEAM';
         this.docentesKey = 'docentesULEAM';
         this.materiasKey = 'materiasULEAM';
     }
 
+    // ============================================
     // INICIALIZACIÓN Y CARGA DE DATOS
+    // ============================================
     inicializar() {
         // Cargar datos desde localStorage
-        this.cargarHorariosDesdeStorage();
+        this.cargarGruposDesdeStorage();
         this.cargarDocentesDesdeStorage();
         this.cargarMateriasDesdeStorage();
         
@@ -23,16 +25,27 @@ class XMLHorarioManager {
             this.crearMateriasIniciales();
         }
         
-        console.log("✅ Sistema XML inicializado");
+        console.log("✅ Sistema XML con grupos inicializado");
         console.log(`📚 Docentes: ${this.docentes.length}`);
         console.log(`📖 Materias: ${this.materias.length}`);
-        console.log(`🕐 Horarios guardados: ${this.horarios.length}`);
+        console.log(`📦 Grupos guardados: ${this.grupos.length}`);
+        
+        // Contar total de horarios
+        const totalHorarios = this.grupos.reduce((sum, g) => sum + g.horarios.length, 0);
+        console.log(`🕐 Total de horarios: ${totalHorarios}`);
     }
 
+    // ============================================
     // GESTIÓN DE LOCALSTORAGE
-    cargarHorariosDesdeStorage() {
+    // ============================================
+    cargarGruposDesdeStorage() {
         const datos = localStorage.getItem(this.storageKey);
-        this.horarios = datos ? JSON.parse(datos) : [];
+        this.grupos = datos ? JSON.parse(datos) : [];
+    }
+
+    guardarGruposEnStorage() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.grupos));
+        console.log(`💾 ${this.grupos.length} grupos guardados en localStorage`);
     }
 
     cargarDocentesDesdeStorage() {
@@ -40,25 +53,22 @@ class XMLHorarioManager {
         this.docentes = datos ? JSON.parse(datos) : [];
     }
 
+    guardarDocentesEnStorage() {
+        localStorage.setItem(this.docentesKey, JSON.stringify(this.docentes));
+    }
+
     cargarMateriasDesdeStorage() {
         const datos = localStorage.getItem(this.materiasKey);
         this.materias = datos ? JSON.parse(datos) : [];
-    }
-
-    guardarHorariosEnStorage() {
-        localStorage.setItem(this.storageKey, JSON.stringify(this.horarios));
-        console.log(`💾 ${this.horarios.length} horarios guardados en localStorage`);
-    }
-
-    guardarDocentesEnStorage() {
-        localStorage.setItem(this.docentesKey, JSON.stringify(this.docentes));
     }
 
     guardarMateriasEnStorage() {
         localStorage.setItem(this.materiasKey, JSON.stringify(this.materias));
     }
 
+    // ============================================
     // DATOS INICIALES (CATÁLOGOS)  
+    // ============================================
     crearDocentesIniciales() {
         this.docentes = [
             {
@@ -110,7 +120,9 @@ class XMLHorarioManager {
         this.guardarMateriasEnStorage();
     }
 
+    // ============================================
     // OBTENER DATOS 
+    // ============================================
     obtenerDocentes() {
         return this.docentes;
     }
@@ -119,162 +131,60 @@ class XMLHorarioManager {
         return this.materias;
     }
 
-    obtenerHorarios() {
-        return this.horarios;
+    obtenerGrupos() {
+        return this.grupos;
     }
 
+    obtenerTodosLosHorarios() {
+        // Retorna todos los horarios de todos los grupos en un solo array
+        const todosLosHorarios = [];
+        this.grupos.forEach(grupo => {
+            todosLosHorarios.push(...grupo.horarios);
+        });
+        return todosLosHorarios;
+    }
 
-    // AGREGAR NUEVO HORARIO
-    agregarHorario(datos) {
-        // Generar ID único
-        const nuevoId = `CLS${String(this.horarios.length + 1).padStart(3, '0')}`;
-        
-        const nuevoHorario = {
-            id: nuevoId,
-            docenteId: datos.docenteId,
-            docenteNombre: datos.docenteNombre,
-            materiaId: datos.materiaId,
-            materiaNombre: datos.materiaNombre,
-            especialidad: datos.especialidad,
-            semestre: datos.semestre,
-            paralelo: datos.paralelo,
-            curso: datos.curso,
-            dia: datos.dia,
-            horaInicio: datos.horaInicio,
-            horaFin: datos.horaFin,
-            franjaHoraria: datos.franjaHoraria,
+    // ============================================
+    // GESTIÓN DE GRUPOS
+    // ============================================
+    agregarGrupoHorarios(nombreGrupo, horariosArray) {
+        const nuevoGrupo = {
+            id: `GRP${String(this.grupos.length + 1).padStart(3, '0')}`,
+            nombre: nombreGrupo,
             fechaCreacion: new Date().toISOString(),
-            estado: 'activo'
+            horarios: horariosArray.map((h, index) => ({
+                id: `CLS${String(index + 1).padStart(3, '0')}`,
+                ...h
+            }))
         };
         
-        this.horarios.push(nuevoHorario);
-        this.guardarHorariosEnStorage();
+        this.grupos.push(nuevoGrupo);
+        this.guardarGruposEnStorage();
         
-        console.log(`✅ Horario ${nuevoId} agregado`);
-        return nuevoId;
+        console.log(`✅ Grupo "${nombreGrupo}" creado con ${horariosArray.length} horarios`);
+        return nuevoGrupo.id;
     }
 
-    // ELIMINAR HORARIO
-    eliminarHorario(dia, franjaHoraria) {
-        const index = this.horarios.findIndex(h => 
-            h.dia === dia && h.franjaHoraria === franjaHoraria
-        );
-        
-        if (index !== -1) {
-            const eliminado = this.horarios.splice(index, 1);
-            this.guardarHorariosEnStorage();
-            console.log(`🗑️ Horario eliminado:`, eliminado[0]);
+    eliminarGrupo(indiceGrupo) {
+        if (indiceGrupo >= 0 && indiceGrupo < this.grupos.length) {
+            const eliminado = this.grupos.splice(indiceGrupo, 1);
+            this.guardarGruposEnStorage();
+            console.log(`🗑️ Grupo eliminado:`, eliminado[0]);
             return true;
         }
         return false;
     }
 
-    // CARGAR HORARIOS EN LA TABLA HTML
-    cargarHorariosEnTabla() {
-        // Limpiar todas las celdas primero
-        const celdas = document.querySelectorAll('.class-cell, .empty-cell');
-        celdas.forEach(celda => {
-            if (!celda.classList.contains('time-cell')) {
-                celda.className = 'empty-cell';
-                celda.innerHTML = '';
-                celda.onclick = null;
-            }
-        });
-
-        // Cargar horarios guardados
-        this.horarios.forEach(horario => {
-            const celda = document.querySelector(
-                `td[data-dia="${horario.dia}"][data-hora="${horario.franjaHoraria}"]`
-            );
-            
-            if (celda) {
-                celda.className = 'class-cell';
-                celda.innerHTML = `
-                    <small>
-                        ${horario.docenteNombre}<br>
-                        ${horario.materiaNombre}<br>
-                        ${horario.especialidad}<br>
-                        ${horario.semestre} "${horario.paralelo}"<br>
-                        ${horario.curso}
-                    </small>
-                `;
-                
-                // Agregar evento de eliminación
-                celda.onclick = () => {
-                    if (confirm('¿Desea eliminar esta clase del horario?')) {
-                        this.eliminarHorario(horario.dia, horario.franjaHoraria);
-                        celda.className = 'empty-cell';
-                        celda.innerHTML = '';
-                        celda.onclick = null;
-                        mostrarEstado('🗑️ Horario eliminado', 'success');
-                    }
-                };
-            }
-        });
-        
-        console.log(`✅ ${this.horarios.length} horarios cargados en la tabla`);
-        return this.horarios.length;
+    limpiarTodosLosGrupos() {
+        this.grupos = [];
+        this.guardarGruposEnStorage();
+        console.log('🗑️ Todos los grupos eliminados');
     }
 
-    cargarHorariosEspecificos(indices) {
-        // Limpiar tabla
-        const celdas = document.querySelectorAll('.class-cell, .empty-cell');
-        celdas.forEach(celda => {
-            if (!celda.classList.contains('time-cell')) {
-                celda.className = 'empty-cell';
-                celda.innerHTML = '';
-                celda.onclick = null;
-            }
-        });
-
-        // Cargar solo los horarios seleccionados
-        let cargados = 0;
-        indices.forEach(index => {
-            const horario = this.horarios[index];
-            if (!horario) {
-                console.log(`⚠️ No se encontró horario en índice ${index}`);
-                return;
-            }
-            
-            console.log(`Cargando horario ${index}:`, horario);
-            
-            const celda = document.querySelector(
-                `td[data-dia="${horario.dia}"][data-hora="${horario.franjaHoraria}"]`
-            );
-            
-            if (celda) {
-                celda.className = 'class-cell';
-                celda.innerHTML = `
-                    <small>
-                        ${horario.docenteNombre}<br>
-                        ${horario.materiaNombre}<br>
-                        ${horario.especialidad}<br>
-                        ${horario.semestre} "${horario.paralelo}"<br>
-                        ${horario.curso}
-                    </small>
-                `;
-                
-                celda.onclick = () => {
-                    if (confirm('¿Desea eliminar esta clase del horario?')) {
-                        this.eliminarHorario(horario.dia, horario.franjaHoraria);
-                        celda.className = 'empty-cell';
-                        celda.innerHTML = '';
-                        celda.onclick = null;
-                        mostrarEstado('🗑️ Horario eliminado', 'success');
-                    }
-                };
-                cargados++;
-            } else {
-                console.log(`⚠️ No se encontró celda para día="${horario.dia}" hora="${horario.franjaHoraria}"`);
-            }
-        });
-        
-        console.log(`✅ ${cargados} de ${indices.length} horarios cargados`);
-        return cargados;
-    }
-
+    // ============================================
     // EXPORTAR A XML
-    generarXML() {
+    // ============================================
+    generarXML(indiceGrupo = null) {
         let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
         xml += '<sistemaHorarios>\n';
         
@@ -282,7 +192,20 @@ class XMLHorarioManager {
         xml += '  <metadata>\n';
         xml += '    <institucion>ULEAM</institucion>\n';
         xml += `    <fechaGeneracion>${new Date().toISOString().split('T')[0]}</fechaGeneracion>\n`;
-        xml += `    <totalHorarios>${this.horarios.length}</totalHorarios>\n`;
+        
+        if (indiceGrupo !== null && indiceGrupo >= 0 && indiceGrupo < this.grupos.length) {
+            const grupo = this.grupos[indiceGrupo];
+            xml += `    <tipoExportacion>grupo_individual</tipoExportacion>\n`;
+            xml += `    <grupoId>${grupo.id}</grupoId>\n`;
+            xml += `    <grupoNombre>${grupo.nombre}</grupoNombre>\n`;
+            xml += `    <totalHorarios>${grupo.horarios.length}</totalHorarios>\n`;
+        } else {
+            xml += `    <tipoExportacion>todos_los_grupos</tipoExportacion>\n`;
+            xml += `    <totalGrupos>${this.grupos.length}</totalGrupos>\n`;
+            const totalHorarios = this.grupos.reduce((sum, g) => sum + g.horarios.length, 0);
+            xml += `    <totalHorarios>${totalHorarios}</totalHorarios>\n`;
+        }
+        
         xml += '  </metadata>\n\n';
         
         // Docentes
@@ -307,43 +230,63 @@ class XMLHorarioManager {
         });
         xml += '  </materias>\n\n';
         
-        // Horarios
-        xml += '  <horarios>\n';
-        this.horarios.forEach(horario => {
-            xml += `    <clase id="${horario.id}">\n`;
-            xml += `      <docenteRef idDocente="${horario.docenteId}"/>\n`;
-            xml += `      <materiaRef idMateria="${horario.materiaId}"/>\n`;
-            xml += '      <detalles>\n';
-            xml += `        <especialidad>${horario.especialidad}</especialidad>\n`;
-            xml += `        <semestre>${horario.semestre}</semestre>\n`;
-            xml += `        <paralelo>${horario.paralelo}</paralelo>\n`;
-            xml += `        <curso>${horario.curso}</curso>\n`;
-            xml += '      </detalles>\n';
-            xml += '      <horario>\n';
-            xml += `        <dia>${horario.dia}</dia>\n`;
-            xml += `        <horaInicio>${horario.horaInicio}</horaInicio>\n`;
-            xml += `        <horaFin>${horario.horaFin}</horaFin>\n`;
-            xml += `        <franjaHoraria>${horario.franjaHoraria}</franjaHoraria>\n`;
-            xml += '      </horario>\n';
-            xml += `      <estado>${horario.estado}</estado>\n`;
-            xml += `      <fechaCreacion>${horario.fechaCreacion}</fechaCreacion>\n`;
-            xml += '    </clase>\n';
-        });
-        xml += '  </horarios>\n';
+        // Grupos y horarios
+        xml += '  <grupos>\n';
         
+        const gruposAExportar = indiceGrupo !== null 
+            ? [this.grupos[indiceGrupo]] 
+            : this.grupos;
+        
+        gruposAExportar.forEach(grupo => {
+            xml += `    <grupo id="${grupo.id}">\n`;
+            xml += `      <nombre>${grupo.nombre}</nombre>\n`;
+            xml += `      <fechaCreacion>${grupo.fechaCreacion}</fechaCreacion>\n`;
+            xml += `      <totalClases>${grupo.horarios.length}</totalClases>\n`;
+            xml += '      <horarios>\n';
+            
+            grupo.horarios.forEach(horario => {
+                xml += `        <clase id="${horario.id}">\n`;
+                xml += `          <docenteRef idDocente="${horario.docenteId}"/>\n`;
+                xml += `          <materiaRef idMateria="${horario.materiaId}"/>\n`;
+                xml += '          <detalles>\n';
+                xml += `            <especialidad>${horario.especialidad}</especialidad>\n`;
+                xml += `            <semestre>${horario.semestre}</semestre>\n`;
+                xml += `            <paralelo>${horario.paralelo}</paralelo>\n`;
+                xml += `            <curso>${horario.curso}</curso>\n`;
+                xml += '          </detalles>\n';
+                xml += '          <horario>\n';
+                xml += `            <dia>${horario.dia}</dia>\n`;
+                xml += `            <horaInicio>${horario.horaInicio}</horaInicio>\n`;
+                xml += `            <horaFin>${horario.horaFin}</horaFin>\n`;
+                xml += `            <franjaHoraria>${horario.franjaHoraria}</franjaHoraria>\n`;
+                xml += '          </horario>\n';
+                xml += '        </clase>\n';
+            });
+            
+            xml += '      </horarios>\n';
+            xml += '    </grupo>\n';
+        });
+        
+        xml += '  </grupos>\n';
         xml += '</sistemaHorarios>';
         
         return xml;
     }
 
     // DESCARGAR XML
-    descargarXML(nombreArchivo) {
+    descargarXML(nombreArchivo = null, indiceGrupo = null) {
         if (!nombreArchivo) {
-            const fecha = new Date().toISOString().split('T')[0];
-            nombreArchivo = `horarios_uleam_${fecha}.xml`;
+            if (indiceGrupo !== null && indiceGrupo >= 0 && indiceGrupo < this.grupos.length) {
+                const grupo = this.grupos[indiceGrupo];
+                const fecha = new Date().toISOString().split('T')[0];
+                nombreArchivo = `horarios_${grupo.nombre.replace(/\s+/g, '_')}_${fecha}.xml`;
+            } else {
+                const fecha = new Date().toISOString().split('T')[0];
+                nombreArchivo = `horarios_uleam_todos_${fecha}.xml`;
+            }
         }
         
-        const xmlString = this.generarXML();
+        const xmlString = this.generarXML(indiceGrupo);
         const blob = new Blob([xmlString], { type: 'text/xml' });
         const url = URL.createObjectURL(blob);
         
@@ -358,38 +301,46 @@ class XMLHorarioManager {
         console.log(`✅ XML descargado: ${nombreArchivo}`);
     }
 
-    // UTILIDADES
-    limpiarTodosLosHorarios() {
-        if (confirm('⚠️ ¿Está seguro de eliminar TODOS los horarios? Esta acción no se puede deshacer.')) {
-            this.horarios = [];
-            this.guardarHorariosEnStorage();
-            console.log('🗑️ Todos los horarios eliminados');
-            return true;
-        }
-        return false;
+    // ============================================
+    // ESTADÍSTICAS
+    // ============================================
+    obtenerEstadisticas() {
+        const totalHorarios = this.grupos.reduce((sum, g) => sum + g.horarios.length, 0);
+        
+        const horariosPorDia = {
+            lunes: 0,
+            martes: 0,
+            miercoles: 0,
+            jueves: 0,
+            viernes: 0
+        };
+        
+        this.grupos.forEach(grupo => {
+            grupo.horarios.forEach(h => {
+                if (horariosPorDia[h.dia] !== undefined) {
+                    horariosPorDia[h.dia]++;
+                }
+            });
+        });
+        
+        return {
+            totalGrupos: this.grupos.length,
+            totalHorarios,
+            totalDocentes: this.docentes.length,
+            totalMaterias: this.materias.length,
+            horariosPorDia
+        };
     }
 
+    // ============================================
+    // UTILIDADES
+    // ============================================
     buscarDocentePorId(id) {
         return this.docentes.find(d => d.id === id);
     }
 
     buscarMateriaPorId(id) {
         return this.materias.find(m => m.id === id);
-    }
-
-    obtenerEstadisticas() {
-        return {
-            totalHorarios: this.horarios.length,
-            totalDocentes: this.docentes.length,
-            totalMaterias: this.materias.length,
-            horariosPorDia: {
-                lunes: this.horarios.filter(h => h.dia === 'lunes').length,
-                martes: this.horarios.filter(h => h.dia === 'martes').length,
-                miercoles: this.horarios.filter(h => h.dia === 'miercoles').length,
-                jueves: this.horarios.filter(h => h.dia === 'jueves').length,
-                viernes: this.horarios.filter(h => h.dia === 'viernes').length
-            }
-        };
     }
 }
 

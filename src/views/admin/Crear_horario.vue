@@ -32,11 +32,12 @@
         <!-- Estadísticas -->
         <div v-if="mostrarStats" class="estadisticas">
           <h4>📊 Estadísticas del Sistema</h4>
+          <p><strong>Total de Grupos:</strong> {{ stats.totalGrupos }}</p>
           <p><strong>Total de Horarios:</strong> {{ stats.totalHorarios }}</p>
           <p><strong>Docentes registrados:</strong> {{ stats.totalDocentes }}</p>
           <p><strong>Materias disponibles:</strong> {{ stats.totalMaterias }}</p>
           <hr>
-          <h5>Horarios por día:</h5>
+          <h5>Horarios por día (todos los grupos):</h5>
           <p>Lunes: {{ stats.horariosPorDia.lunes }}</p>
           <p>Martes: {{ stats.horariosPorDia.martes }}</p>
           <p>Miércoles: {{ stats.horariosPorDia.miercoles }}</p>
@@ -189,21 +190,15 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import HeaderApp from '@/components/HeaderApp.vue'
-import { useXMLHorarios } from '@/composables/useXMLHorarios'
+import xmlManager from '@/utils/manejadorXML'
 
 const router = useRouter()
 
-const {
-  horarios,
-  docentes,
-  materias,
-  agregarHorario,
-  eliminarHorario,
-  limpiarTodosLosHorarios,
-  cargarHorariosDesdeStorage,
-  descargarXML,
-  obtenerEstadisticas
-} = useXMLHorarios()
+// Inicializar el manager
+xmlManager.inicializar()
+
+const docentes = ref(xmlManager.obtenerDocentes())
+const materias = ref(xmlManager.obtenerMaterias())
 
 const formData = ref({
   docente: '',
@@ -224,6 +219,7 @@ const statusMessage = ref({
 
 const mostrarStats = ref(false)
 const stats = ref({
+  totalGrupos: 0,
   totalHorarios: 0,
   totalDocentes: 0,
   totalMaterias: 0,
@@ -408,12 +404,21 @@ const guardarYVolver = () => {
     return
   }
   
-  // Guardar TODOS los horarios temporales en localStorage
-  horariosTemporales.value.forEach(horarioTemp => {
-    agregarHorario(horarioTemp)
-  })
+  // Solicitar nombre para el grupo
+  const nombreGrupo = prompt(
+    `Ingrese un nombre para este grupo de horarios (${horariosTemporales.value.length} clases):`, 
+    `Grupo ${xmlManager.obtenerGrupos().length + 1}`
+  )
   
-  mostrarEstado(`✅ ${horariosTemporales.value.length} horario(s) guardado(s) correctamente en localStorage`, 'success')
+  if (!nombreGrupo || nombreGrupo.trim() === '') {
+    mostrarEstado('⚠️ Debe ingresar un nombre para el grupo', 'error')
+    return
+  }
+  
+  // Guardar como grupo en el xmlManager
+  xmlManager.agregarGrupoHorarios(nombreGrupo.trim(), horariosTemporales.value)
+  
+  mostrarEstado(`✅ Grupo "${nombreGrupo}" guardado con ${horariosTemporales.value.length} horario(s)`, 'success')
   
   setTimeout(() => {
     router.push('/admin')
@@ -421,34 +426,25 @@ const guardarYVolver = () => {
 }
 
 const mostrarHorariosGuardados = () => {
-  cargarHorariosDesdeStorage()
+  const grupos = xmlManager.obtenerGrupos()
   
-  if (horarios.value.length === 0) {
-    mostrarEstado('ℹ️ No hay horarios guardados', 'info')
+  if (grupos.length === 0) {
+    mostrarEstado('ℹ️ No hay grupos de horarios guardados', 'info')
     return
   }
   
-  console.log('Horarios cargados desde localStorage:', horarios.value)
+  console.log('Grupos cargados desde localStorage:', grupos)
   
-  // Agrupar por características únicas
-  const horariosUnicos = {}
-  horarios.value.forEach((h, index) => {
-    const clave = `${h.semestre}_${h.paralelo}_${h.especialidad}`
-    if (!horariosUnicos[clave]) {
-      horariosUnicos[clave] = {
-        descripcion: `${h.semestre} - Paralelo ${h.paralelo} - ${h.especialidad}`,
-        indices: []
-      }
-    }
-    horariosUnicos[clave].indices.push(index)
+  // Crear mensaje con lista de grupos
+  let mensaje = `📚 Tiene ${grupos.length} grupo(s) de horarios guardados:\n\n`
+  
+  grupos.forEach((grupo, index) => {
+    const fecha = new Date(grupo.fechaCreacion).toLocaleDateString()
+    mensaje += `${index + 1}. "${grupo.nombre}" - ${grupo.horarios.length} clase(s) - ${fecha}\n`
   })
   
-  // Crear opciones para prompt
-  let mensaje = `Tiene ${horarios.value.length} horarios guardados.\n\n`
-  mensaje += 'Ingrese el número de opción:\n'
-  mensaje += '1 - Ver todos\n'
-  mensaje += '2 - Ver por grupo\n\n'
-  mensaje += 'O escriba "cancelar"'
+  mensaje += '\n📋 Ingrese el número del grupo que desea ver\n'
+  mensaje += '(o escriba "cancelar")'
   
   const seleccion = prompt(mensaje)
   
@@ -456,21 +452,33 @@ const mostrarHorariosGuardados = () => {
     return
   }
   
-  if (seleccion === '1') {
-    // Mostrar TODOS los horarios guardados en la tabla
-    horariosTemporales.value = [...horarios.value]
-    mostrarEstado(`📊 ${horarios.value.length} horarios cargados (TODOS)`, 'success')
-  } else if (seleccion === '2') {
-    mostrarSelectorHorarios(horariosUnicos)
+  const numSeleccion = parseInt(seleccion) - 1
+  
+  if (numSeleccion >= 0 && numSeleccion < grupos.length) {
+    const grupo = grupos[numSeleccion]
+    
+    // Cargar horarios del grupo en la tabla
+    horariosTemporales.value = [...grupo.horarios]
+    
+    mostrarEstado(`📊 Grupo "${grupo.nombre}" cargado: ${grupo.horarios.length} clase(s)`, 'success')
+  } else {
+    mostrarEstado('⚠️ Número no válido', 'error')
   }
 }
 
-const mostrarSelectorHorarios = (horariosUnicos) => {
-  let mensaje = 'Seleccione qué horario ver:\n\n'
-  const opciones = Object.entries(horariosUnicos)
+const exportarXML = () => {
+  const grupos = xmlManager.obtenerGrupos()
   
-  opciones.forEach(([clave, datos], index) => {
-    mensaje += `${index + 1} - ${datos.descripcion} (${datos.indices.length} clases)\n`
+  if (grupos.length === 0) {
+    mostrarEstado('⚠️ No hay grupos para exportar', 'error')
+    return
+  }
+  
+  let mensaje = `📚 Seleccione qué exportar:\n\n`
+  mensaje += `0. TODOS LOS GRUPOS (${grupos.length} grupos)\n\n`
+  
+  grupos.forEach((grupo, index) => {
+    mensaje += `${index + 1}. "${grupo.nombre}" - ${grupo.horarios.length} clase(s)\n`
   })
   
   mensaje += '\n(Escriba el número o "cancelar")'
@@ -481,82 +489,81 @@ const mostrarSelectorHorarios = (horariosUnicos) => {
     return
   }
   
-  const numSeleccion = parseInt(seleccion) - 1
+  const num = parseInt(seleccion)
   
-  if (numSeleccion >= 0 && numSeleccion < opciones.length) {
-    const [clave, datos] = opciones[numSeleccion]
-    
-    // Cargar solo los horarios del grupo seleccionado
-    horariosTemporales.value = datos.indices.map(i => horarios.value[i])
-    
-    mostrarEstado(`📊 Horarios cargados: ${datos.descripcion}`, 'success')
+  if (num === 0) {
+    // Exportar todos
+    xmlManager.descargarXML()
+    mostrarEstado('💾 XML con todos los grupos descargado', 'success')
+  } else if (num >= 1 && num <= grupos.length) {
+    // Exportar grupo específico
+    xmlManager.descargarXML(`horarios_${grupos[num - 1].nombre.replace(/\s+/g, '_')}.xml`, num - 1)
+    mostrarEstado(`💾 XML del grupo "${grupos[num - 1].nombre}" descargado`, 'success')
   } else {
     mostrarEstado('⚠️ Número no válido', 'error')
   }
 }
 
-const exportarXML = () => {
-  descargarXML()
-  mostrarEstado('💾 XML descargado exitosamente', 'success')
-}
-
 const mostrarEstadisticas = () => {
-  stats.value = obtenerEstadisticas()
+  stats.value = xmlManager.obtenerEstadisticas()
   mostrarStats.value = true
   mostrarEstado('📈 Estadísticas actualizadas', 'info')
 }
 
 const limpiarTodo = () => {
-  const total = horarios.value.length
+  const grupos = xmlManager.obtenerGrupos()
   
-  if (total === 0) {
-    mostrarEstado('ℹ️ No hay horarios para eliminar', 'info')
+  if (grupos.length === 0) {
+    mostrarEstado('ℹ️ No hay grupos para eliminar', 'info')
     return
   }
   
-  const confirmacion = prompt(`⚠️ Tiene ${total} horario(s) guardado(s) en localStorage.\n\nEscriba:\n1 - Eliminar TODO\n2 - Eliminar uno específico\n\nO "cancelar"`)
+  let mensaje = `⚠️ Tiene ${grupos.length} grupo(s) guardado(s):\n\n`
+  
+  grupos.forEach((grupo, index) => {
+    mensaje += `${index + 1}. "${grupo.nombre}" - ${grupo.horarios.length} clase(s)\n`
+  })
+  
+  mensaje += `\n📋 Opciones:\n`
+  mensaje += `0 - Eliminar TODOS los grupos\n`
+  mensaje += `1-${grupos.length} - Eliminar grupo específico\n`
+  mensaje += `\n(Escriba el número o "cancelar")`
+  
+  const confirmacion = prompt(mensaje)
   
   if (!confirmacion || confirmacion.toLowerCase() === 'cancelar') {
     return
   }
   
-  if (confirmacion === '1') {
-    if (confirm('¿CONFIRMA eliminar TODOS los horarios guardados? No se puede deshacer')) {
-      limpiarTodosLosHorarios()
+  const num = parseInt(confirmacion)
+  
+  if (num === 0) {
+    if (confirm('¿CONFIRMA eliminar TODOS los grupos? No se puede deshacer')) {
+      xmlManager.limpiarTodosLosGrupos()
       horariosTemporales.value = []
-      mostrarEstado('🗑️ Todos los horarios eliminados', 'success')
+      mostrarEstado('🗑️ Todos los grupos eliminados', 'success')
     }
-  } else if (confirmacion === '2') {
-    eliminarHorarioEspecifico()
-  }
-}
-
-const eliminarHorarioEspecifico = () => {
-  if (horarios.value.length === 0) {
-    mostrarEstado('ℹ️ No hay horarios para eliminar', 'info')
-    return
-  }
-  
-  let mensaje = 'Seleccione el horario a eliminar:\n\n'
-  horarios.value.forEach((h, index) => {
-    mensaje += `${index + 1} - ${h.materiaNombre} | ${h.dia} ${h.franjaHoraria} | ${h.semestre}\n`
-  })
-  
-  const seleccion = prompt(mensaje)
-  const numSeleccion = parseInt(seleccion) - 1
-  
-  if (numSeleccion >= 0 && numSeleccion < horarios.value.length) {
-    const horario = horarios.value[numSeleccion]
-    if (eliminarHorario(horario.dia, horario.franjaHoraria)) {
-      // También eliminar de temporales si está visible
-      const tempIndex = horariosTemporales.value.findIndex(h => 
-        h.dia === horario.dia && h.franjaHoraria === horario.franjaHoraria
-      )
-      if (tempIndex !== -1) {
-        horariosTemporales.value.splice(tempIndex, 1)
+  } else if (num >= 1 && num <= grupos.length) {
+    const grupo = grupos[num - 1]
+    if (confirm(`¿Eliminar el grupo "${grupo.nombre}" con ${grupo.horarios.length} clase(s)?`)) {
+      xmlManager.eliminarGrupo(num - 1)
+      
+      // Si el grupo eliminado está en la tabla, limpiarla
+      if (horariosTemporales.value.length > 0) {
+        const primerHorario = horariosTemporales.value[0]
+        const esGrupoActual = grupo.horarios.some(h => 
+          h.dia === primerHorario.dia && 
+          h.franjaHoraria === primerHorario.franjaHoraria
+        )
+        if (esGrupoActual) {
+          horariosTemporales.value = []
+        }
       }
-      mostrarEstado(`🗑️ Horario "${horario.materiaNombre}" eliminado`, 'success')
+      
+      mostrarEstado(`🗑️ Grupo "${grupo.nombre}" eliminado`, 'success')
     }
+  } else {
+    mostrarEstado('⚠️ Número no válido', 'error')
   }
 }
 
