@@ -3,9 +3,10 @@
     <HeaderApp />
 
     <main class="main-content">
-      <!-- Sección XML Controls -->
+      <!-- Panel de control para gestionar los horarios guardados -->
       <section class="xml-controls">
         <h3>📄 Gestión de Horarios XML</h3>
+        <!-- Fila de botones para las diferentes acciones -->
         <div class="xml-buttons-row">
           <button class="xml-btn xml-btn-primary" @click="mostrarHorariosGuardados">
             📊 Mostrar Horarios Guardados
@@ -30,6 +31,7 @@
         </div>
 
         <!-- Estadísticas -->
+        <!-- Panel de estadísticas - se muestra solo cuando mostrarStats es true -->
         <div v-if="mostrarStats" class="estadisticas">
           <h4>📊 Estadísticas del Sistema</h4>
           <p><strong>Total de Grupos:</strong> {{ stats.totalGrupos }}</p>
@@ -37,6 +39,8 @@
           <p><strong>Docentes registrados:</strong> {{ stats.totalDocentes }}</p>
           <p><strong>Materias disponibles:</strong> {{ stats.totalMaterias }}</p>
           <hr>
+
+          <!-- Mostrar distribución de horarios por día de la semana -->
           <h5>Horarios por día (todos los grupos):</h5>
           <p>Lunes: {{ stats.horariosPorDia.lunes }}</p>
           <p>Martes: {{ stats.horariosPorDia.martes }}</p>
@@ -47,30 +51,37 @@
       </section>
 
       <!-- Sección Crear Horario -->
+      <!-- Formulario para ingresar nuevos horarios -->
       <section class="create-schedule-section">
         <h2>Crear nuevos horarios</h2>
         
         <div class="form-container">
+         <!-- Campo para seleccionar docente -->
           <div class="form-row">
             <label>Seleccione al docente:</label>
+            <!-- Select vinculado a formData.docente con v-model -->
             <select v-model="formData.docente" class="form-select">
               <option value="">-- Seleccione --</option>
+              <!-- Repetir sobre el array de docentes para crear las opciones -->
               <option v-for="doc in docentes" :key="doc.id" :value="doc.id">
                 {{ doc.nombre }}
               </option>
             </select>
           </div>
 
+          <!-- Campo para seleccionar materia -->
           <div class="form-row">
             <label>Seleccione la materia:</label>
             <select v-model="formData.materia" class="form-select">
               <option value="">-- Seleccione --</option>
+              <!-- Mostrar nombre y código de cada materia -->
               <option v-for="mat in materias" :key="mat.id" :value="mat.id">
                 {{ mat.nombre }} ({{ mat.codigo }})
               </option>
             </select>
           </div>
 
+          <!-- Campo para seleccionar especialidad -->
           <div class="form-row">
             <label>Seleccione la especialidad:</label>
             <select v-model="formData.especialidad" class="form-select">
@@ -80,6 +91,7 @@
             </select>
           </div>
 
+          <!-- Campo para seleccionar paralelo -->
           <div class="form-row">
             <label>Seleccione el paralelo:</label>
             <select v-model="formData.paralelo" class="form-select">
@@ -90,6 +102,7 @@
             </select>
           </div>
 
+          <!-- Campo para seleccionar el número de curso -->
           <div class="form-row">
             <label>Seleccione el curso:</label>
             <select v-model="formData.curso" class="form-select">
@@ -103,6 +116,7 @@
             </select>
           </div>
 
+          <!-- Campo para seleccionar semestre -->
           <div class="form-row">
             <label>Seleccione el semestre:</label>
             <select v-model="formData.semestre" class="form-select">
@@ -118,6 +132,7 @@
             </select>
           </div>
 
+          <!-- Campo para seleccionar la hora -->
           <div class="form-row">
             <label>Seleccione la hora:</label>
             <select v-model="formData.hora" class="form-select">
@@ -136,6 +151,7 @@
             </select>
           </div>
 
+          <!-- Campo para seleccionar día de la semana -->
           <div class="form-row">
             <label>Seleccione el día:</label>
             <select v-model="formData.dia" class="form-select">
@@ -148,6 +164,7 @@
             </select>
           </div>
 
+          <!-- Botones de acción del formulario -->
           <div class="form-buttons">
             <button class="btn-action" @click="guardarYVolver">GUARDAR</button>
             <button class="btn-action btn-add" @click="ingresarHorario">INGRESAR</button>
@@ -155,10 +172,12 @@
         </div>
       </section>
 
+      <!-- Muestra los horarios en formato de calendario -->
       <!-- Tabla de horario -->
       <section class="calendar-section">
         <div class="calendar-container">
           <table class="schedule-table">
+            <!-- Encabezado de la tabla con los días de la semana -->
             <thead>
               <tr>
                 <th>HORA</th>
@@ -169,12 +188,19 @@
                 <th>VIERNES</th>
               </tr>
             </thead>
+            <!-- Cuerpo de la tabla con las franjas horarias -->
             <tbody>
+              <!-- Crear una fila por cada franja horaria -->
               <tr v-for="(slot, index) in timeSlots" :key="index">
+                <!-- Celda con la hora -->
                 <td class="time-cell">{{ slot }}</td>
+                <!-- Crear una celda por cada día de la semana -->
+                <!-- :class determina si la celda tiene una clase asignada o está vacía -->
+                <!-- @click permite eliminar clases haciendo clic en la celda -->
                 <td v-for="dia in dias" :key="`${dia}-${slot}`" 
                     :class="getCellClass(dia, slot)"
                     @click="handleCellClick(dia, slot)">
+                  <!-- Mostrar contenido de la clase si existe -->
                   <small v-if="getCellContent(dia, slot)" v-html="getCellContent(dia, slot)"></small>
                 </td>
               </tr>
@@ -187,9 +213,12 @@
 </template>
 
 <script setup>
+// Importar ref para crear variables reactivas
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+// Importar componente de header
 import HeaderApp from '@/components/HeaderApp.vue'
+// Importar el manejador de XML (localStorage) para persistir datos
 import xmlManager from '@/utils/manejadorXML'
 
 const router = useRouter()
@@ -197,9 +226,12 @@ const router = useRouter()
 // Inicializar el manager
 xmlManager.inicializar()
 
+// Lista de docentes obtenida del xmlManager
 const docentes = ref(xmlManager.obtenerDocentes())
+// Lista de materias obtenida del xmlManager
 const materias = ref(xmlManager.obtenerMaterias())
 
+// Objeto reactivo que contiene todos los campos del formulario, con sus ID
 const formData = ref({
   docente: '',
   materia: '',
@@ -211,13 +243,16 @@ const formData = ref({
   dia: ''
 })
 
+// Objeto reactivo para mostrar mensajes de éxito, error o información
 const statusMessage = ref({
   show: false,
   texto: '',
   tipo: 'info'
 })
 
+// Bandera para mostrar/ocultar el panel de estadísticas
 const mostrarStats = ref(false)
+// Objeto con las estadísticas del sistema
 const stats = ref({
   totalGrupos: 0,
   totalHorarios: 0,
@@ -232,9 +267,10 @@ const stats = ref({
   }
 })
 
-// Horarios temporales visibles en la tabla (solo para esta sesión)
+// Horarios temporales visibles en la tabla (solo para esta sesión), solo se guarda al presionar "GUARDAR"
 const horariosTemporales = ref([])
 
+// Array con todas las franjas horarias del día
 const timeSlots = [
   '08:00 - 09:00',
   '09:00 - 10:00',
@@ -249,6 +285,7 @@ const timeSlots = [
   '19:00 - 20:00'
 ]
 
+// Array con los días de la semana
 const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']
 
 // Funciones de utilidad
@@ -259,11 +296,13 @@ const mostrarEstado = (texto, tipo = 'info') => {
     tipo
   }
   
+  // Ocultar el mensaje después de 4 segundos
   setTimeout(() => {
     statusMessage.value.show = false
   }, 4000)
 }
 
+// Limpia el formulario despues de ingresar un horario exitoso 
 const limpiarFormulario = () => {
   formData.value = {
     docente: '',
@@ -277,36 +316,43 @@ const limpiarFormulario = () => {
   }
 }
 
+// Obtiene el nombre de un docente por su ID
 const getDocenteNombre = (id) => {
   const doc = docentes.value.find(d => d.id === id)
   return doc ? doc.nombre : ''
 }
 
+// Obtiene el nombre de una materia por su ID
 const getMateriaNombre = (id) => {
   const mat = materias.value.find(m => m.id === id)
   return mat ? mat.nombre : ''
 }
 
-// Convertir slot a franja horaria
+// Convertir slot de tiempo al fomrato de una franja horaria
 const slotToFranja = (slot) => {
   return slot.replace(/\s/g, '').replace('-', '-')
 }
 
 // Funciones de la tabla - SOLO MUESTRAN horariosTemporales
+// Determina la clase CSS de una celda según si tiene horario o está vacía
 const getCellClass = (dia, slot) => {
   const franjaHoraria = slotToFranja(slot)
+  // Buscar si existe un horario temporal en esta celda
   const horario = horariosTemporales.value.find(h => 
     h.dia === dia && h.franjaHoraria === franjaHoraria
   )
   return horario ? 'class-cell' : 'empty-cell'
 }
 
+// Obtiene el contenido HTML formateado de una celda
 const getCellContent = (dia, slot) => {
   const franjaHoraria = slotToFranja(slot)
+  // Buscar el horario en esta celda
   const horario = horariosTemporales.value.find(h => 
     h.dia === dia && h.franjaHoraria === franjaHoraria
   )
   
+  // Si existe, formatear la información con saltos de línea
   if (horario) {
     return `
       ${horario.docenteNombre}<br>
@@ -319,18 +365,22 @@ const getCellContent = (dia, slot) => {
   return null
 }
 
+// Maneja lo que es el click de una celda en la tabla permitiendo asi eliminar un horario temporal 
 const handleCellClick = (dia, slot) => {
   const franjaHoraria = slotToFranja(slot)
+  // Buscar si hay un horario en esta celda
   const horario = horariosTemporales.value.find(h => 
     h.dia === dia && h.franjaHoraria === franjaHoraria
   )
   
+  // Si exite uno pregunta si desea eliminarlo 
   if (horario) {
     if (confirm('¿Desea eliminar esta clase del horario temporal?')) {
       const index = horariosTemporales.value.findIndex(h => 
         h.dia === dia && h.franjaHoraria === franjaHoraria
       )
       if (index !== -1) {
+        // Elimina el horario del array temporal 
         horariosTemporales.value.splice(index, 1)
         mostrarEstado('🗑️ Horario temporal eliminado', 'success')
       }
@@ -339,6 +389,7 @@ const handleCellClick = (dia, slot) => {
 }
 
 // Funciones principales
+// Ingresa un nuevo horario a la tabla temporal, no los guarda en el localStorage solo lo muestra 
 const ingresarHorario = () => {
   console.log('Intentando ingresar horario...', formData.value)
   
@@ -373,7 +424,9 @@ const ingresarHorario = () => {
   }
 
   // Preparar datos
+  // Separar la franja horaria en inicio y fin
   const [horaInicio, horaFin] = formData.value.hora.split('-')
+  // Crear objeto con toda la información de la clase
   const datosClase = {
     docenteId: formData.value.docente,
     docenteNombre: getDocenteNombre(formData.value.docente),
@@ -395,9 +448,11 @@ const ingresarHorario = () => {
   horariosTemporales.value.push(datosClase)
   
   mostrarEstado(`✅ Horario ingresado en la tabla temporal`, 'success')
+  // Limpiar el formulario para ingresar otro horario
   limpiarFormulario()
 }
 
+// Guarda los horarios temporales con el grupo que se le asigne y regresa a la interfaz de admin
 const guardarYVolver = () => {
   if (horariosTemporales.value.length === 0) {
     mostrarEstado('⚠️ No hay horarios para guardar', 'error')
@@ -415,7 +470,7 @@ const guardarYVolver = () => {
     return
   }
   
-  // Guardar como grupo en el xmlManager
+  // Guardar el grupo en localStorage
   xmlManager.agregarGrupoHorarios(nombreGrupo.trim(), horariosTemporales.value)
   
   mostrarEstado(`✅ Grupo "${nombreGrupo}" guardado con ${horariosTemporales.value.length} horario(s)`, 'success')
@@ -425,6 +480,7 @@ const guardarYVolver = () => {
   }, 1000)
 }
 
+// Muestra la lista de grupos guardados y permite cargar uno en la tabla
 const mostrarHorariosGuardados = () => {
   const grupos = xmlManager.obtenerGrupos()
   
@@ -448,12 +504,14 @@ const mostrarHorariosGuardados = () => {
   
   const seleccion = prompt(mensaje)
   
+  //cancelar si el usuario no ingreso nada 
   if (!seleccion || seleccion.toLowerCase() === 'cancelar') {
     return
   }
   
   const numSeleccion = parseInt(seleccion) - 1
   
+  // Validar que el número esté en el rango correcto
   if (numSeleccion >= 0 && numSeleccion < grupos.length) {
     const grupo = grupos[numSeleccion]
     
@@ -466,14 +524,17 @@ const mostrarHorariosGuardados = () => {
   }
 }
 
+// Exporta los grupos de horarios en formato XML
 const exportarXML = () => {
   const grupos = xmlManager.obtenerGrupos()
   
+  // Verifica si hay grupos para exportar
   if (grupos.length === 0) {
     mostrarEstado('⚠️ No hay grupos para exportar', 'error')
     return
   }
   
+  // Crea un menu de opciones
   let mensaje = `📚 Seleccione qué exportar:\n\n`
   mensaje += `0. TODOS LOS GRUPOS (${grupos.length} grupos)\n\n`
   
@@ -504,12 +565,14 @@ const exportarXML = () => {
   }
 }
 
+// Calcula y muestra las estadísticas del sistema
 const mostrarEstadisticas = () => {
   stats.value = xmlManager.obtenerEstadisticas()
   mostrarStats.value = true
   mostrarEstado('📈 Estadísticas actualizadas', 'info')
 }
 
+// Elimina grupos de horarios guardados
 const limpiarTodo = () => {
   const grupos = xmlManager.obtenerGrupos()
   
@@ -531,6 +594,7 @@ const limpiarTodo = () => {
   
   const confirmacion = prompt(mensaje)
   
+  // Cancela si no se ingreso nada
   if (!confirmacion || confirmacion.toLowerCase() === 'cancelar') {
     return
   }
@@ -538,12 +602,14 @@ const limpiarTodo = () => {
   const num = parseInt(confirmacion)
   
   if (num === 0) {
+    // Eliminar TODOS los grupos
     if (confirm('¿CONFIRMA eliminar TODOS los grupos? No se puede deshacer')) {
       xmlManager.limpiarTodosLosGrupos()
       horariosTemporales.value = []
       mostrarEstado('🗑️ Todos los grupos eliminados', 'success')
     }
   } else if (num >= 1 && num <= grupos.length) {
+    // Eliminar un grupo específico
     const grupo = grupos[num - 1]
     if (confirm(`¿Eliminar el grupo "${grupo.nombre}" con ${grupo.horarios.length} clase(s)?`)) {
       xmlManager.eliminarGrupo(num - 1)
@@ -567,6 +633,7 @@ const limpiarTodo = () => {
   }
 }
 
+// Abre el dialogo de iempresion del navegador, solo muestra la tabla del horario 
 const descargarPDF = () => {
   window.print()
   mostrarEstado('📄 Abriendo vista de impresión/PDF', 'info')
@@ -582,7 +649,7 @@ const descargarPDF = () => {
     flex-direction: column;
 }
 
-/* Main Content */
+/* Área principal donde se muestra todo el contenido */
 .main-content {
     padding: 30px;
     overflow-y: auto;
@@ -593,6 +660,7 @@ const descargarPDF = () => {
 }
 
 /* Sección de gestión XML */
+/* Panel de control para gestión de horarios */
 .xml-controls {
     background: #e8f4f8;
     padding: 20px 25px;
@@ -602,6 +670,7 @@ const descargarPDF = () => {
     max-width: 1200px;
 }
 
+/* Título del panel de gestión */
 .xml-controls h3 {
     margin: 0 0 15px 0;
     color: #2c5aa0;
@@ -611,11 +680,14 @@ const descargarPDF = () => {
 
 /* Botones XML en fila horizontal */
 .xml-buttons-row {
+    /* Espacio entre botones */
     display: flex;
     gap: 10px;
+    /* Permitir que los botones se envuelvan en múltiples líneas */
     flex-wrap: wrap;
 }
 
+/* Estilo base para los botones de gestión */
 .xml-btn {
     padding: 10px 18px;
     border: none;
@@ -629,23 +701,28 @@ const descargarPDF = () => {
     color: white;
 }
 
+/* Botón primario (azul) */
 .xml-btn-primary {
     background: #4a90e2;
 }
 
+/* Hover del botón primario */
 .xml-btn-primary:hover {
     background: #357abd;
 }
 
+/* Botón de peligro (rojo) - para eliminar */
 .xml-btn-danger {
     background: #dc3545;
 }
 
+/* Hover del botón de peligro */
 .xml-btn-danger:hover {
     background: #c82333;
 }
 
 /* Mensaje de estado */
+/* Caja de mensajes de estado (éxito, error, info) */
 .status-message {
     margin-top: 15px;
     padding: 12px;
@@ -653,25 +730,28 @@ const descargarPDF = () => {
     font-weight: 500;
 }
 
+/* Mensaje informativo (azul) */
 .status-info {
     background: #d1ecf1;
     color: #0c5460;
     border: 1px solid #bee5eb;
 }
 
+/* Mensaje de éxito (verde) */
 .status-success {
     background: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
 
+/* Mensaje de error (rojo) */
 .status-error {
     background: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
 
-/* Estadísticas */
+/* Contenedor de estadísticas */
 .estadisticas {
     margin-top: 20px;
     padding: 15px;
@@ -680,15 +760,18 @@ const descargarPDF = () => {
     border: 1px solid #ccc;
 }
 
+/* Títulos dentro del panel de estadísticas */
 .estadisticas h4, .estadisticas h5 {
     margin: 10px 0;
     color: #333;
 }
 
+/* Párrafos con los datos estadísticos */
 .estadisticas p {
     margin: 5px 0;
 }
 
+/* Separador horizontal en estadísticas */
 .estadisticas hr {
     margin: 15px 0;
     border: none;
@@ -705,6 +788,7 @@ const descargarPDF = () => {
     margin: 25px auto;
 }
 
+/* Título de la sección */
 .create-schedule-section h2 {
     font-size: 20px;
     color: #333;
@@ -718,6 +802,7 @@ const descargarPDF = () => {
     margin: 0;
 }
 
+/* Cada fila del formulario (label + select) */
 .form-row {
     display: block;
     margin-bottom: 8px;
@@ -725,12 +810,14 @@ const descargarPDF = () => {
     color: #333;
 }
 
+/* Etiqueta de cada campo */
 .form-row label {
     display: inline;
     font-weight: normal;
     margin-right: 5px;
 }
 
+/* Selectores del formulario */
 .form-select {
     display: inline-block;
     padding: 4px 8px;
@@ -742,6 +829,7 @@ const descargarPDF = () => {
     min-width: 150px;
 }
 
+/* Efecto focus en los selectores */
 .form-select:focus {
     outline: none;
     border-color: #4a90e2;
@@ -756,6 +844,7 @@ const descargarPDF = () => {
     width: 120px;
 }
 
+/* Estilo base para botones de acción */
 .btn-action {
     padding: 8px 20px;
     border: 1px solid #999;
@@ -770,15 +859,18 @@ const descargarPDF = () => {
     text-align: center;
 }
 
+/* Hover en botones de acción */
 .btn-action:hover {
     background: #f0f0f0;
 }
 
+/* Botón de agregar (INGRESAR) */
 .btn-add {
     background: white;
     border: 1px solid #999;
 }
 
+/* Hover del botón INGRESAR */
 .btn-add:hover {
     background: #f0f0f0;
 }
@@ -794,11 +886,13 @@ const descargarPDF = () => {
     overflow: hidden;
 }
 
+/* Contenedor con scroll horizontal si es necesario */
 .calendar-container {
     overflow-x: auto;
     padding: 20px;
 }
 
+/* Tabla del horario semanal */
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
@@ -806,10 +900,12 @@ const descargarPDF = () => {
     font-size: 13px;
 }
 
+/* Encabezado de la tabla */
 .schedule-table thead {
     background: #f8f9fa;
 }
 
+/* Celdas del encabezado (días de la semana) */
 .schedule-table th {
     padding: 10px;
     text-align: center;
@@ -819,6 +915,7 @@ const descargarPDF = () => {
     font-size: 13px;
 }
 
+/* Todas las celdas de la tabla */
 .schedule-table td {
     padding: 12px 8px;
     text-align: center;
@@ -827,6 +924,7 @@ const descargarPDF = () => {
     font-size: 13px;
 }
 
+/* Celda de tiempo (primera columna con las horas) */
 .time-cell {
     background: #f8f9fa;
     font-weight: normal;
@@ -834,6 +932,7 @@ const descargarPDF = () => {
     white-space: nowrap;
 }
 
+/* Celda con clase asignada */
 .class-cell {
     background: white;
     cursor: pointer;
@@ -841,11 +940,13 @@ const descargarPDF = () => {
     color: #333;
 }
 
+/* Hover en celda con clase (para eliminar) */
 .class-cell:hover {
     background: #667eea;
     color: white;
 }
 
+/* Celda vacía (sin clase asignada) */
 .empty-cell {
     background: white;
 }
@@ -884,6 +985,7 @@ const descargarPDF = () => {
     border: 1px solid #000;
   }
 
+  /* Asegurar que los colores de fondo se impriman */
   .time-cell {
     background: #f0f0f0 !important;
     -webkit-print-color-adjust: exact;
@@ -894,7 +996,7 @@ const descargarPDF = () => {
     background: white !important;
   }
 
-  /* Ajustar el tamaño de página */
+  /* Configurar la página para orientación horizontal */
   @page {
     size: landscape;
     margin: 1cm;

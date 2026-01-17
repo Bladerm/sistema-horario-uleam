@@ -6,6 +6,7 @@
       <section class="report-section">
         <h2>GENERAR REPORTES</h2>
         
+        <!-- Selector para elegir qué tipo de reporte generar -->
         <div class="report-form">
           <!-- Tipo de reporte -->
           <div class="form-row">
@@ -25,6 +26,7 @@
           <div class="filter-section">
             <h3>Filtro:</h3>
             
+            <!-- Filtro por carrera/especialidad -->
             <div class="form-row">
               <label>Carrera:</label>
               <select v-model="carrera" class="form-input">
@@ -34,6 +36,7 @@
               </select>
             </div>
 
+            <!-- Filtro por período académico -->
             <div class="form-row">
               <label>Periodo:</label>
               <select v-model="periodo" class="form-input">
@@ -44,6 +47,7 @@
               </select>
             </div>
 
+            <!-- Filtro por fecha específica -->
             <div class="form-row">
               <label>Fecha:</label>
               <input type="date" v-model="fecha" class="form-input">
@@ -51,14 +55,18 @@
           </div>
 
           <!-- Formato -->
+          <!-- Selección del formato en que se generará el reporte -->
           <div class="format-section">
             <h3>Formato:</h3>
+            <!-- Grupo de radio buttons para seleccionar formato -->
             <div class="radio-group">
               <label class="radio-label">
+                <!-- Opción para formato PDF (seleccionada por defecto) -->
                 <input type="radio" v-model="formato" value="pdf" checked>
                 <span>PDF</span>
               </label>
 
+              <!-- Opción para formato JPG (imagen) -->
               <label class="radio-label">
                 <input type="radio" v-model="formato" value="jpg">
                 <span>JPG</span>
@@ -87,6 +95,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 // Verificar autenticación
+// Si el usuario no es admin, redirigir al login
 if (authStore.tipoUsuario !== 'admin') {
   router.push('/login')
 }
@@ -99,6 +108,7 @@ const fecha = ref('')
 const formato = ref('pdf')
 
 // Funciones
+// Valida que se haya seleccionado un tipo de reporte antes de proceder
 const generarReporte = () => {
   if (!tipoReporte.value) {
     alert('Por favor seleccione un tipo de reporte')
@@ -109,6 +119,7 @@ const generarReporte = () => {
   router.push('/admin')
 }
 
+// Cancela la generación del reporte y vuelve al dashboard
 const cancelar = () => {
   if (confirm('¿Seguro que quiere salir?')) {
     router.push('/admin')
@@ -125,7 +136,7 @@ const cancelar = () => {
     flex-direction: column;
 }
 
-/* Main Content */
+/* Área principal donde se muestra el formulario */
 .main-content {
     padding: 30px;
     overflow-y: auto;
@@ -135,6 +146,7 @@ const cancelar = () => {
     flex: 1;
 }
 
+/* Contenedor principal del formulario de reportes */
 .report-section {
     background: white;
     padding: 30px;
@@ -153,19 +165,21 @@ const cancelar = () => {
     text-align: left;
 }
 
-/* Formulario de reportes */
+/* Contenedor del formulario con todos los campos */
 .report-form {
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
+/* Contenedor de cada campo (label + input/select) */
 .form-row {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
+/* Etiqueta de cada campo */
 .form-row label {
     font-size: 15px;
     color: #333;
@@ -187,7 +201,7 @@ const cancelar = () => {
     font-weight: 500;
 }
 
-/* Entrada del formulario (select, date, text) */
+/* Estilo para todos los inputs y selects del formulario */
 .form-input {
     width: 100%;
     padding: 10px 15px;
@@ -198,6 +212,7 @@ const cancelar = () => {
     transition: all 0.3s;
 }
 
+/* Efecto cuando el input/select está enfocado */
 .form-input:focus {
     outline: none;
     border-color: #667eea;
@@ -219,12 +234,14 @@ const cancelar = () => {
     color: #333;
 }
 
+/* Estilo del radio button */
 .radio-label input[type="radio"] {
     width: 18px;
     height: 18px;
     cursor: pointer;
 }
 
+/* Texto junto al radio button */
 .radio-label span {
     user-select: none;
 }
@@ -250,26 +267,28 @@ const cancelar = () => {
     pointer-events: auto !important;
 }
 
-/* Estilo del botón primario */
+/* Estilo del botón primario (Generar reporte) */
 .btn-primary {
     background: white;
     color: #333;
     border: 2px solid #d0d0d0;
 }
 
+/* Hover del botón primario */
 .btn-primary:hover {
     background: #f5f5f5;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo del botón secundario */
+/* Estilo del botón secundario (Cancelar) */
 .btn-secondary {
     background: white;
     color: #333;
     border: 2px solid #d0d0d0;
 }
 
+/* Hover del botón secundario */
 .btn-secondary:hover {
     background: #f5f5f5;
     transform: translateY(-2px);

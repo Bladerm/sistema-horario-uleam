@@ -9,14 +9,17 @@
       
       <h2>Iniciar Sesión</h2>
       
+      <!-- Mensaje de error (se muestra/oculta según el estado de 'error') -->
       <div class="error-message" :style="{ display: error ? 'block' : 'none' }">
         {{ error }}
       </div>
       
+      <!-- Formulario de login. @submit.prevent evita el comportamiento por defecto del formulario -->
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label for="email">Ingrese su correo:</label>
           <input 
+          <!-- Input de email con v-model para enlace bidireccional con el estado 'email' -->
             type="email" 
             id="email"
             v-model="email"
@@ -25,6 +28,7 @@
           >
         </div>
         
+        <!-- Grupo del campo de contraseña -->
         <div class="form-group">
           <label for="password">Ingrese su contraseña:</label>
           <input 
@@ -51,11 +55,15 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+// Importación del store de autenticación para manejar el login
 import { useAuthStore } from '@/stores/auth'
 
+// Inicialización del router
 const router = useRouter()
+// Inicialización del store de autenticación
 const authStore = useAuthStore()
 
+// Variable reactiva para almacenar el email ingresado por el usuario
 const email = ref('')
 const password = ref('')
 const error = ref('')
@@ -65,9 +73,11 @@ const validarEmail = (email) => {
   return regex.test(email)
 }
 
+// Se ejecuta cuando el usuario envía el formulario
 const handleLogin = () => {
   error.value = ''
   
+  // Valida q los comapos esten completos 
   if (!email.value || !password.value) {
     error.value = 'Por favor, complete todos los campos'
     return
@@ -115,6 +125,7 @@ const mostrarRecuperacion = () => {
     bottom: 0;
 }
 
+/* Caja blanca que contiene el formulario */
 .container {
     background: rgba(255, 255, 255, 0.95);
     padding: 40px;
@@ -124,6 +135,7 @@ const mostrarRecuperacion = () => {
     max-width: 400px;
 }
 
+/* Círculo que contiene el icono de usuario */
 .user-icon {
     width: 80px;
     height: 80px;
@@ -136,6 +148,7 @@ const mostrarRecuperacion = () => {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* SVG del icono dentro del círculo */
 .user-icon svg {
     width: 45px;
     height: 45px;
@@ -149,10 +162,12 @@ h2 {
     font-size: 24px;
 }
 
+/* Contenedor de cada campo (label + input) */
 .form-group {
     margin-bottom: 20px;
 }
 
+/* Etiquetas de los campos */
 label {
     display: block;
     margin-bottom: 8px;
@@ -160,6 +175,7 @@ label {
     font-weight: 500;
 }
 
+/* Campos de entrada (email y password) */
 input {
     width: 100%;
     padding: 12px 15px;
@@ -170,6 +186,7 @@ input {
     background: white;
 }
 
+/* Efecto cuando el input está enfocado (usuario escribiendo) */
 input:focus {
     outline: none;
     border-color: #667eea;
@@ -181,6 +198,7 @@ input:focus {
     margin: 15px 0;
 }
 
+/* Estilo del enlace */
 .forgot-link a {
     color: #667eea;
     text-decoration: none;
@@ -193,6 +211,7 @@ input:focus {
     text-decoration: underline;
 }
 
+/* Botón de "Ingresar" */
 button {
     width: 100%;
     padding: 14px;
@@ -207,15 +226,18 @@ button {
     margin-top: 10px;
 }
 
+/* Efecto hover del botón (elevar ligeramente) */
 button:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
+/* Efecto cuando se hace clic en el botón */
 button:active {
     transform: translateY(0);
 }
 
+/* Caja que muestra mensajes de error */
 .error-message {
     background: #fee;
     color: #c33;

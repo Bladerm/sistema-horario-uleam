@@ -8,6 +8,8 @@
         <div class="calendar-container">
           <table class="schedule-table">
             <thead>
+
+              <!-- Encabezado de la tabla con los días de la semana -->
               <tr>
                 <th>HORA</th>
                 <th>LUNES</th>
@@ -116,16 +118,21 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+// Importar store de autenticación para verificar permisos
 import { useAuthStore } from '@/stores/auth'
 import HeaderApp from '@/components/HeaderApp.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
+// Si el usuario no es estudiante, redirigir al login
 if (authStore.tipoUsuario !== 'estudiante') {
   router.push('/login')
 }
 
+// Muestra información detallada de una materia
+// Guardar la materia seleccionada en localStorage
+// Esto permite que la página de detalle acceda a esta información
 const mostrarInfoMateria = (nombreMateria) => {
   localStorage.setItem('materiaActual', JSON.stringify({
     nombre: nombreMateria
@@ -135,6 +142,7 @@ const mostrarInfoMateria = (nombreMateria) => {
 </script>
 
 <style scoped>
+/* Wrapper para toda la página del estudiante */
 .estudiante-wrapper {
     min-height: 100vh;
     background: #f5f5f5;
@@ -142,8 +150,10 @@ const mostrarInfoMateria = (nombreMateria) => {
     flex-direction: column;
 }
 
+/* Área principal donde se muestra el calendario */
 .main-content {
     padding: 30px;
+    /* Permitir scroll vertical si el contenido es muy largo */
     overflow-y: auto;
     max-width: 1400px;
     margin: 0 auto;
@@ -151,6 +161,7 @@ const mostrarInfoMateria = (nombreMateria) => {
     flex: 1;
 }
 
+/* Contenedor de la sección del calendario */
 .calendar-section {
     background: white;
     padding: 25px;
@@ -160,27 +171,33 @@ const mostrarInfoMateria = (nombreMateria) => {
     margin: 0 auto;
 }
 
+/* Título de la sección */
 .calendar-section h2 {
     font-size: 20px;
     color: #333;
     margin-bottom: 20px;
 }
 
+/* Contenedor con scroll horizontal si la tabla es muy ancha */
 .calendar-container {
     overflow-x: auto;
 }
 
+/* Tabla principal del calendario semanal */
 .schedule-table {
     width: 100%;
+    /* Colapsar bordes para evitar líneas dobles */
     border-collapse: collapse;
     background: white;
     font-size: 14px;
 }
 
+/* Encabezado de la tabla */
 .schedule-table thead {
     background: #f8f9fa;
 }
 
+/* Celdas del encabezado (HORA, LUNES, MARTES, etc.) */
 .schedule-table th {
     padding: 12px;
     text-align: center;
@@ -189,6 +206,7 @@ const mostrarInfoMateria = (nombreMateria) => {
     color: #333;
 }
 
+/* Todas las celdas de datos de la tabla */
 .schedule-table td {
     padding: 10px;
     text-align: center;
@@ -196,6 +214,7 @@ const mostrarInfoMateria = (nombreMateria) => {
     min-height: 50px;
 }
 
+/* Celda de tiempo (primera columna con las horas) */
 .time-cell {
     background: #f8f9fa;
     font-weight: 500;
@@ -203,13 +222,16 @@ const mostrarInfoMateria = (nombreMateria) => {
     white-space: nowrap;
 }
 
+/* Celda con clase asignada (clickeable) */
 .class-cell {
     background: white;
+    /* Cursor pointer para indicar que es clickeable */
     cursor: pointer;
     transition: all 0.3s;
     color: #333;
 }
 
+/* Efecto hover en celdas con clase */
 .class-cell:hover {
     background: #667eea;
     color: white;
@@ -217,6 +239,7 @@ const mostrarInfoMateria = (nombreMateria) => {
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
+/* Celda vacía (sin clase asignada) */
 .empty-cell {
     background: #fafafa;
 }

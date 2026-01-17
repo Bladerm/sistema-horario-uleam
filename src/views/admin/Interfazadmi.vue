@@ -44,12 +44,15 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+// Importar el store de autenticación para verificar permisos
 import { useAuthStore } from '@/stores/auth'
+// Importar el componente de header compartido
 import HeaderApp from '@/components/HeaderApp.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
+// Si el usuario no es admin, redirigir al login
 if (authStore.tipoUsuario !== 'admin') {
   router.push('/login')
 }
@@ -72,7 +75,7 @@ const irAGenerarReporte = () => {
     flex-direction: column;
 }
 
-/* Main Content */
+/* Área principal donde se muestra el contenido del dashboard */
 .main-content {
     padding: 30px;
     overflow-y: auto;
@@ -82,7 +85,7 @@ const irAGenerarReporte = () => {
     flex: 1;
 }
 
-/* Sección de Alertas */
+/* Contenedor de la sección de alertas */
 .alerts-section {
     background: white;
     padding: 25px;
@@ -95,12 +98,14 @@ const irAGenerarReporte = () => {
     margin-bottom: 25px;
 }
 
+/* Título de la sección de alertas */
 .alerts-section h2 {
     font-size: 20px;
     color: #333;
     margin-bottom: 20px;
 }
 
+/* Contenedor que agrupa todas las alertas */
 .alerts-container {
     display: flex;
     flex-direction: column;
