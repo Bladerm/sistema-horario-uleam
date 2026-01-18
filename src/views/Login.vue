@@ -18,8 +18,8 @@
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label for="email">Ingrese su correo:</label>
-          <input 
-            <!-- Input de email con v-model para enlace bidireccional con el estado 'email' -->
+          <!-- Input de email con v-model para enlace bidireccional con el estado 'email' -->
+          <input
             type="email" 
             id="email"
             v-model="email"
