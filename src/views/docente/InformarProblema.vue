@@ -17,6 +17,7 @@
           </div>
 
           <!-- Botones de acción -->
+          <!-- Botones de envio -->
           <div class="button-group">
             <button class="btn-enviar" @click="enviarProblema">Enviar</button>
           </div>
@@ -35,12 +36,15 @@ import HeaderApp from '@/components/HeaderApp.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 
+// Si el usuario no es docente, redirigir al login
 if (authStore.tipoUsuario !== 'docente') {
   router.push('/login')
 }
 
+// Texto del problema ingresado por el docente
 const problemaTexto = ref('')
 
+// Valida que el texto del problema cumpla con los requisitos
 const validarTextoProblema = (texto) => {
   const regexLongitudMin = /^.{10,}$/
   if (!regexLongitudMin.test(texto)) {
@@ -48,27 +52,32 @@ const validarTextoProblema = (texto) => {
     return false
   }
   
+  // Verificar que no exceda 500 caracteres
   if (texto.length > 500) {
     alert('El problema no puede exceder los 500 caracteres')
     return false
   }
   
+  // Regex que verifica que el texto contenga al menos una letra (español)
   const regexLetras = /[a-záéíóúñA-ZÁÉÍÓÚÑ]/
   if (!regexLetras.test(texto)) {
     alert('El problema debe contener texto válido con letras')
     return false
   }
-  
+  // Regex que verifica si el texto solo contiene espacios en blanco
   const regexSoloEspacios = /^\s*$/
   if (regexSoloEspacios.test(texto)) {
     alert('El problema no puede estar vacío o contener solo espacios')
     return false
   }
   
+  // Si todas las validaciones pasan, retornar true
   return true
 }
 
+// Envía el problema reportado al sistema
 const enviarProblema = () => {
+  // Limpiar espacios en blanco al inicio y final del texto
   const texto = problemaTexto.value.trim()
   
   if (texto === '') {
@@ -80,16 +89,20 @@ const enviarProblema = () => {
     return
   }
 
+  // Obtener array de problemas existentes o crear uno nuevo si no existe
   let problemas = JSON.parse(localStorage.getItem('problemas')) || []
   problemas.push(texto)
+  // Guardar el array actualizado en localStorage
   localStorage.setItem('problemas', JSON.stringify(problemas))
 
+  // Mostrar mensaje de éxito
   alert('Informe enviado al administrador')
   router.push('/docente/materia')
 }
 </script>
 
 <style scoped>
+/* Wrapper para toda la página */
 .informar-problema-wrapper {
     min-height: 100vh;
     background: #f5f5f5;
@@ -97,6 +110,7 @@ const enviarProblema = () => {
     flex-direction: column;
 }
 
+/* Área principal donde se muestra el formulario */
 .main-content {
     padding: 30px;
     overflow-y: auto;
@@ -106,6 +120,7 @@ const enviarProblema = () => {
     flex: 1;
 }
 
+/* Contenedor principal del formulario de reporte */
 .report-section {
     background: white;
     padding: 30px;
@@ -115,6 +130,7 @@ const enviarProblema = () => {
     margin: 0 auto;
 }
 
+/* Título principal */
 .report-section h2 {
     font-size: 22px;
     font-weight: bold;
@@ -123,16 +139,19 @@ const enviarProblema = () => {
     text-align: left;
 }
 
+/* Contenedor del formulario */
 .report-form {
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
+/* Contenedor de la sección de texto */
 .filter-section {
     margin-top: 10px;
 }
 
+/* Subtítulo de la sección */
 .filter-section h3 {
     font-size: 16px;
     color: #666;
@@ -140,6 +159,7 @@ const enviarProblema = () => {
     font-weight: 500;
 }
 
+/* Campo de texto grande para escribir el problema */
 .problema-textarea {
     width: 100%;
     min-height: 200px;
@@ -153,15 +173,18 @@ const enviarProblema = () => {
     transition: all 0.3s;
 }
 
+/* Efecto focus en el textarea */
 .problema-textarea:focus {
     outline: none;
     border-color: #667eea;
 }
 
+/* Estilo del placeholder (texto de ayuda) */
 .problema-textarea::placeholder {
     color: #999;
 }
 
+/* Grupo de botones */
 .button-group {
     display: flex;
     gap: 15px;
@@ -169,6 +192,7 @@ const enviarProblema = () => {
     margin-top: 20px;
 }
 
+/* Botón de enviar */
 .btn-enviar {
     padding: 12px 40px;
     border: none;
@@ -181,6 +205,7 @@ const enviarProblema = () => {
     color: #333;
 }
 
+/* Hover del botón de enviar */
 .btn-enviar:hover {
     background: #b8b8b8;
     transform: translateY(-2px);

@@ -8,6 +8,7 @@
         
         <div class="report-form">
           <!-- Seleccionar materia -->
+          <!-- Selector de materia a actualizar -->
           <div class="filter-section">
             <h3>Seleccione la materia que sea actualizar:</h3>
             <select class="form-input" v-model="formulario.materia">
@@ -71,7 +72,7 @@
 
           <!-- Seleccionar aula (opcional) -->
           <div class="filter-section">
-            <h3>Seleccione el aula (opcional):</h3>
+            <h3>Seleccione el aula:</h3>
             <select class="form-input" v-model="formulario.aula">
               <option value="">-- Seleccione un aula --</option>
               <option value="Aula 101">Aula 101</option>
@@ -96,7 +97,7 @@
             ></textarea>
           </div>
 
-          <!-- Botones -->
+          <!-- Grupo de botones de acción -->
           <div class="button-group">
             <button class="btn-secondary" @click="cancelar">Cancelar</button>
             <button class="btn-primary" @click="enviarSolicitud">Enviar solicitud</button>
@@ -120,6 +121,7 @@ if (authStore.tipoUsuario !== 'docente') {
   router.push('/login')
 }
 
+// Formulario reactivo que contiene todos los campos de la solicitud
 const formulario = reactive({
   materia: '',
   paralelo: '',
@@ -129,14 +131,17 @@ const formulario = reactive({
   motivo: ''
 })
 
+// Función para enviar la solicitud de actualización de horario
 const enviarSolicitud = () => {
   if (!formulario.materia || !formulario.paralelo || !formulario.dia || !formulario.hora || !formulario.motivo) {
     alert('Por favor, complete todos los campos obligatorios')
     return
   }
 
+  // Obtiene el array de solicitudes existentes de localStorage
   let solicitudes = JSON.parse(localStorage.getItem('solicitudesActualizacion')) || []
   
+  // Crea el objeto de solicitud con todos los datos del formulario
   const solicitud = {
     materia: formulario.materia,
     paralelo: formulario.paralelo,
@@ -159,6 +164,7 @@ const cancelar = () => {
 </script>
 
 <style scoped>
+/* Wrapper de toda la página */
 .actualizar-horario-wrapper {
     min-height: 100vh;
     background: #f5f5f5;
@@ -166,6 +172,7 @@ const cancelar = () => {
     flex-direction: column;
 }
 
+/* Área principal de contenido */
 .main-content {
     padding: 30px;
     overflow-y: auto;
@@ -175,6 +182,7 @@ const cancelar = () => {
     flex: 1;
 }
 
+/* Contenedor de la sección de actualización */
 .report-section {
     background: white;
     padding: 30px;
@@ -184,6 +192,7 @@ const cancelar = () => {
     margin: 0 auto;
 }
 
+/* Título de la sección */
 .report-section h2 {
     font-size: 22px;
     font-weight: bold;
@@ -192,16 +201,19 @@ const cancelar = () => {
     text-align: left;
 }
 
+/* Contenedor del formulario */
 .report-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
+/* Contenedor de cada sección de campo (label + input/select/textarea) */
 .filter-section {
     margin-top: 5px;
 }
 
+/* Etiquetas (h3) de cada campo */
 .filter-section h3 {
     font-size: 16px;
     color: #666;
@@ -209,6 +221,7 @@ const cancelar = () => {
     font-weight: 500;
 }
 
+/* Estilo base para todos los select del formulario */
 .form-input {
     width: 100%;
     padding: 10px 15px;
@@ -219,11 +232,13 @@ const cancelar = () => {
     transition: all 0.3s;
 }
 
+/* Efecto focus de los select (cuando están seleccionados) */
 .form-input:focus {
     outline: none;
     border-color: #667eea;
 }
 
+/* Textarea para el motivo del cambio */
 .problema-textarea {
     width: 100%;
     min-height: 150px;
@@ -237,15 +252,18 @@ const cancelar = () => {
     transition: all 0.3s;
 }
 
+/* Efecto focus del textarea (cuando está seleccionado) */
 .problema-textarea:focus {
     outline: none;
     border-color: #667eea;
 }
 
+/* Estilo del placeholder (texto de ejemplo) */
 .problema-textarea::placeholder {
     color: #999;
 }
 
+/* Contenedor del grupo de botones */
 .button-group {
     display: flex;
     gap: 15px;
@@ -253,6 +271,7 @@ const cancelar = () => {
     margin-top: 20px;
 }
 
+/* Estilos base compartidos para ambos botones */
 .btn-primary,
 .btn-secondary {
     padding: 12px 40px;
@@ -264,24 +283,28 @@ const cancelar = () => {
     transition: all 0.3s;
 }
 
+/* Botón primario (Enviar solicitud) */
 .btn-primary {
     background: white;
     color: #333;
     border: 2px solid #d0d0d0;
 }
 
+/* Efecto hover del botón primario */
 .btn-primary:hover {
     background: #f5f5f5;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Botón secundario (Cancelar) */
 .btn-secondary {
     background: white;
     color: #333;
     border: 2px solid #d0d0d0;
 }
 
+/* Efecto hover del botón secundario */
 .btn-secondary:hover {
     background: #f5f5f5;
     transform: translateY(-2px);
